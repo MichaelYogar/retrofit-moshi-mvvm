@@ -2,6 +2,7 @@ package com.practice.retromoshi
 
 import android.os.Bundle
 import android.util.Log
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
@@ -12,9 +13,11 @@ import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 
 class MainActivity : AppCompatActivity() {
+    lateinit var textView: TextView
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        textView = findViewById(R.id.tv_hello)
 
 
         val moshi = Moshi.Builder().addLast(KotlinJsonAdapterFactory()).build()
@@ -24,15 +27,23 @@ class MainActivity : AppCompatActivity() {
             .build()
 
         val service: RickAndMortyService = retrofit.create(RickAndMortyService::class.java)
-        service.getCharacterById().enqueue(object : Callback<Any> {
-            override fun onResponse(call: Call<Any>, response: Response<Any>) {
-                Log.d("MainActivity", response.body().toString())
+        service.getCharacterById(8).enqueue(object : Callback<GetCharacterByIdResponse> {
+            override fun onResponse(
+                call: Call<GetCharacterByIdResponse>,
+                response: Response<GetCharacterByIdResponse>
+            ) {
+                if (!response.isSuccessful) {
+                    Log.e("MainActivity", "Error in GET request")
+                } else {
+                    val body = response.body()?.let { body ->
+                        textView.text = body.name
+                    }
+                }
             }
 
-            override fun onFailure(call: Call<Any>, t: Throwable) {
+            override fun onFailure(call: Call<GetCharacterByIdResponse>, t: Throwable) {
                 Log.e("MainActivity", t.message!!)
             }
-
         })
     }
 
