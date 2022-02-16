@@ -2,10 +2,12 @@ package com.practice.retromoshi
 
 import android.os.Bundle
 import android.util.Log
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
+import com.squareup.picasso.Picasso
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -13,11 +15,11 @@ import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 
 class MainActivity : AppCompatActivity() {
-    lateinit var textView: TextView
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        textView = findViewById(R.id.tv_hello)
+        val textView = findViewById<TextView>(R.id.tv_name)
+        val cardImage = findViewById<ImageView>(R.id.iv_card_image)
 
 
         val moshi = Moshi.Builder().addLast(KotlinJsonAdapterFactory()).build()
@@ -37,6 +39,7 @@ class MainActivity : AppCompatActivity() {
                 } else {
                     val body = response.body()?.let { body ->
                         textView.text = body.name
+                        Picasso.get().load(body.image).into(cardImage)
                     }
                 }
             }
